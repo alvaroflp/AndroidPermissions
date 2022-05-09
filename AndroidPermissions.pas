@@ -1,9 +1,12 @@
-unit uAndroidPermissions;
+﻿unit AndroidPermissions;
 
 interface
 
 uses System.Permissions, FMX.DialogService, FMX.MediaLibrary.Actions
-
+{$IF CompilerVersion >= 35.0}
+  // Delphi 11 Alexandria
+  ,System.Types
+{$ENDIF}
 {$IFDEF ANDROID}
     , Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Os
 {$ENDIF}
@@ -19,9 +22,17 @@ type
     pFineLocation, pCoarseLocation: string; // GPS
     pPhoneState: string; // Phone State
 
+{$IF CompilerVersion >= 35.0}
+    // after Delphi 11 Alexandria
+    procedure PermissionRequestResult(Sender: TObject;
+      const APermissions: TClassicStringDynArray;
+      const AGrantResults: TClassicPermissionStatusDynArray);
+{$ELSE}
+    // before Delphi 11 Alexandria
     procedure PermissionRequestResult(Sender: TObject;
       const APermissions: TArray<string>;
       const AGrantResults: TArray<TPermissionStatus>);
+{$ENDIF}
   public
     MyCallBack, MyCallBackError: TCallbackProc;
     MyCameraAction: TTakePhotoFromCameraAction;
@@ -70,9 +81,17 @@ begin
 {$ENDIF}
 end;
 
-procedure TAndroidPermissions.PermissionRequestResult(Sender: TObject;
-  const APermissions: TArray<string>;
-  const AGrantResults: TArray<TPermissionStatus>);
+{$IF CompilerVersion >= 35.0}
+    // after Delphi 11 Alexandria
+    procedure TAndroidPermissions.PermissionRequestResult(Sender: TObject;
+      const APermissions: TClassicStringDynArray;
+      const AGrantResults: TClassicPermissionStatusDynArray);
+{$ELSE}
+    // before Delphi 11 Alexandria
+    procedure TAndroidPermissions.PermissionRequestResult(Sender: TObject;
+      const APermissions: TArray<string>;
+      const AGrantResults: TArray<TPermissionStatus>);
+{$ENDIF}
 var
   ret: boolean;
 begin
